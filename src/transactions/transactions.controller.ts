@@ -8,8 +8,6 @@ export class TransactionsController {
 
   @Get()
   findAll() {
-    console.log('here');
-
     return this.transactionService.findAll();
   }
 
