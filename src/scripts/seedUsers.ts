@@ -7,6 +7,10 @@ async function bootstrap() {
 
   const transactionsService = app.get(TransactionsService);
   await transactionsService.seedUsers();
+  console.log('Users Seeded Complete');
+
+  await transactionsService.seedTransactions('transactions-1');
+  console.log('Transactions 1 Seeded Complete');
   await app.close();
 }
 

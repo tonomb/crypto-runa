@@ -27,4 +27,10 @@ export class TransactionsService {
     const users = JSON.parse(contents);
     await this.userRepository.save(users);
   }
+
+  async seedTransactions(fileName: string) {
+    const contents = await readFile(`${fileName}.json`, 'utf-8');
+    const transactions = JSON.parse(contents).transactions;
+    await this.transactionRepository.save(transactions);
+  }
 }
