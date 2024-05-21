@@ -52,8 +52,14 @@ export class TransactionsService {
     const transactions = await this.transactionRepository.find();
 
     for (const transaction of transactions) {
-      await this.updateUserBalance(transaction);
+      if (this.validateConfirmation(transaction)) {
+        await this.updateUserBalance(transaction);
+      }
     }
+  }
+
+  private validateConfirmation(transaction: Transaction): boolean {
+    return transaction.confirmations > 5;
   }
 
   private async updateUserBalance(transaction: Transaction): Promise<void> {
