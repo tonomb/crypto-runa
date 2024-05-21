@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { User } from './user.entity';
+import { ProcessedTransactions } from './processedTransactions.entity';
 import { readFile } from 'fs/promises';
 
 @Injectable()
@@ -12,6 +13,8 @@ export class TransactionsService {
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(ProcessedTransactions)
+    private processedTransactions: Repository<ProcessedTransactions>,
   ) {}
 
   findAll(): Promise<Transaction[]> {
