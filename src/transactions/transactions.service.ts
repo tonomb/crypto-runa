@@ -30,7 +30,18 @@ export class TransactionsService {
 
   async seedTransactions(fileName: string) {
     const contents = await readFile(`${fileName}.json`, 'utf-8');
-    const transactions = JSON.parse(contents).transactions;
-    await this.transactionRepository.save(transactions);
+    const transactionsData = JSON.parse(contents).transactions;
+
+    const uniqueTransactions = [];
+    const seenTxids = new Set();
+
+    transactionsData.forEach((transaction) => {
+      if (!seenTxids.has(transaction.txid)) {
+        uniqueTransactions.push(transaction);
+        seenTxids.add(transaction.txid);
+      }
+    });
+
+    await this.transactionRepository.save(uniqueTransactions);
   }
 }

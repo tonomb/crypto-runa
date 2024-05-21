@@ -11,6 +11,9 @@ async function bootstrap() {
 
   await transactionsService.seedTransactions('transactions-1');
   console.log('Transactions 1 Seeded Complete');
+
+  await transactionsService.seedTransactions('transactions-2');
+  console.log('Transactions 2 Seeded Complete');
   await app.close();
 }
 
