@@ -14,7 +14,7 @@ export class TransactionsService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(ProcessedTransactions)
-    private processedTransactions: Repository<ProcessedTransactions>,
+    private processedTransactionsRepository: Repository<ProcessedTransactions>,
   ) {}
 
   findAll(): Promise<Transaction[]> {
@@ -52,8 +52,20 @@ export class TransactionsService {
     const transactions = await this.transactionRepository.find();
 
     for (const transaction of transactions) {
-      if (this.validateConfirmation(transaction)) {
-        await this.updateUserBalance(transaction);
+      const proccessed = await this.processedTransactionsRepository.findOne({
+        where: { txid: transaction.txid },
+      });
+
+      if (!proccessed) {
+        if (this.validateConfirmation(transaction)) {
+          await this.updateUserBalance(transaction);
+        }
+        await this.markTransactionAsProcessed(transaction.txid);
+      } else {
+        // Transaction has already been proccessed and user credited, skipping
+        // console.log(
+        //   `Transaction: ${transaction.txid} has already been processed, skipping`,
+        // );
       }
     }
   }
@@ -108,5 +120,13 @@ export class TransactionsService {
     user.transactions += 1;
 
     await this.userRepository.save(user);
+  }
+
+  private async markTransactionAsProcessed(txid: string): Promise<void> {
+    const processedTransaction = new ProcessedTransactions();
+    processedTransaction.txid = txid;
+    processedTransaction.processedAt = new Date();
+
+    await this.processedTransactionsRepository.save(processedTransaction);
   }
 }
