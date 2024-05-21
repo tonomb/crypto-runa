@@ -49,24 +49,29 @@ export class TransactionsService {
   }
 
   async processTransactions(): Promise<void> {
-    const transactions = await this.transactionRepository.find();
+    try {
+      const transactions = await this.transactionRepository.find();
 
-    for (const transaction of transactions) {
-      const proccessed = await this.processedTransactionsRepository.findOne({
-        where: { txid: transaction.txid },
-      });
+      for (const transaction of transactions) {
+        const proccessed = await this.processedTransactionsRepository.findOne({
+          where: { txid: transaction.txid },
+        });
 
-      if (!proccessed) {
-        if (this.validateConfirmation(transaction)) {
-          await this.updateUserBalance(transaction);
+        if (!proccessed) {
+          if (this.validateConfirmation(transaction)) {
+            await this.updateUserBalance(transaction);
+          }
+          await this.markTransactionAsProcessed(transaction.txid);
+        } else {
+          // Transaction has already been proccessed and user credited, skipping
+          // console.log(
+          //   `Transaction: ${transaction.txid} has already been processed, skipping`,
+          // );
         }
-        await this.markTransactionAsProcessed(transaction.txid);
-      } else {
-        // Transaction has already been proccessed and user credited, skipping
-        // console.log(
-        //   `Transaction: ${transaction.txid} has already been processed, skipping`,
-        // );
       }
+    } catch (error) {
+      console.error('Error processing transactions: ', error);
+      throw error;
     }
   }
 
@@ -75,35 +80,45 @@ export class TransactionsService {
   }
 
   private async updateUserBalance(transaction: Transaction): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: {
-        address: transaction.address,
-      },
-    });
+    try {
+      const user = await this.userRepository.findOne({
+        where: {
+          address: transaction.address,
+        },
+      });
 
-    if (user) {
-      await this.applyTransaction(user, transaction);
-    } else {
-      // NO Address Exists, add balance to unknown address
-      await this.updateNoRefferenceBalance(transaction);
+      if (user) {
+        await this.applyTransaction(user, transaction);
+      } else {
+        // NO Address Exists, add balance to unknown address
+        await this.updateNoRefferenceBalance(transaction);
+      }
+    } catch (error) {
+      console.error('Error updating user balance', error);
+      throw error;
     }
   }
 
   private async updateNoRefferenceBalance(
     transaction: Transaction,
   ): Promise<void> {
-    const noReff = await this.userRepository.findOne({
-      where: {
-        address: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      },
-    });
+    try {
+      const noReff = await this.userRepository.findOne({
+        where: {
+          address: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        },
+      });
 
-    if (noReff) {
-      await this.applyTransaction(noReff, transaction);
-    } else {
-      console.warn(
-        'No Reff user not found. Ensure the database was seeded properly',
-      );
+      if (noReff) {
+        await this.applyTransaction(noReff, transaction);
+      } else {
+        console.warn(
+          'No Reff user not found. Ensure the database was seeded properly',
+        );
+      }
+    } catch (error) {
+      console.error('Error updating no reff', error);
+      throw error;
     }
   }
 
@@ -111,22 +126,32 @@ export class TransactionsService {
     user: User,
     transaction: Transaction,
   ): Promise<void> {
-    if (transaction.category === 'receive') {
-      user.balance += transaction.amount;
-    } else if (transaction.category === 'send') {
-      user.balance -= transaction.amount;
+    try {
+      if (transaction.category === 'receive') {
+        user.balance += transaction.amount;
+      } else if (transaction.category === 'send') {
+        user.balance -= transaction.amount;
+      }
+
+      user.transactions += 1;
+
+      await this.userRepository.save(user);
+    } catch (error) {
+      console.error('Error applying transaction to user', error);
+      throw error;
     }
-
-    user.transactions += 1;
-
-    await this.userRepository.save(user);
   }
 
   private async markTransactionAsProcessed(txid: string): Promise<void> {
-    const processedTransaction = new ProcessedTransactions();
-    processedTransaction.txid = txid;
-    processedTransaction.processedAt = new Date();
+    try {
+      const processedTransaction = new ProcessedTransactions();
+      processedTransaction.txid = txid;
+      processedTransaction.processedAt = new Date();
 
-    await this.processedTransactionsRepository.save(processedTransaction);
+      await this.processedTransactionsRepository.save(processedTransaction);
+    } catch (error) {
+      console.error('Error marking transaction as processed', error);
+      throw error;
+    }
   }
 }
