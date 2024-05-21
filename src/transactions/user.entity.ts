@@ -7,4 +7,10 @@ export class User {
 
   @Column()
   name: string;
+
+  @Column()
+  balance: number;
+
+  @Column()
+  transactions: number;
 }

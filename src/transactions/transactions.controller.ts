@@ -15,4 +15,10 @@ export class TransactionsController {
   create(@Body() transaction: Transaction): Promise<Transaction> {
     return this.transactionService.create(transaction);
   }
+
+  @Post('process')
+  async processTransactions() {
+    await this.transactionService.processTransactions();
+    console.log('Processed Transactions');
+  }
 }

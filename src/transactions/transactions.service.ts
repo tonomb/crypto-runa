@@ -47,4 +47,60 @@ export class TransactionsService {
 
     await this.transactionRepository.save(uniqueTransactions);
   }
+
+  async processTransactions(): Promise<void> {
+    const transactions = await this.transactionRepository.find();
+
+    for (const transaction of transactions) {
+      await this.updateUserBalance(transaction);
+    }
+  }
+
+  private async updateUserBalance(transaction: Transaction): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: {
+        address: transaction.address,
+      },
+    });
+
+    if (user) {
+      await this.applyTransaction(user, transaction);
+    } else {
+      // NO Address Exists, add balance to unknown address
+      await this.updateNoRefferenceBalance(transaction);
+    }
+  }
+
+  private async updateNoRefferenceBalance(
+    transaction: Transaction,
+  ): Promise<void> {
+    const noReff = await this.userRepository.findOne({
+      where: {
+        address: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      },
+    });
+
+    if (noReff) {
+      await this.applyTransaction(noReff, transaction);
+    } else {
+      console.warn(
+        'No Reff user not found. Ensure the database was seeded properly',
+      );
+    }
+  }
+
+  private async applyTransaction(
+    user: User,
+    transaction: Transaction,
+  ): Promise<void> {
+    if (transaction.category === 'receive') {
+      user.balance += transaction.amount;
+    } else if (transaction.category === 'send') {
+      user.balance -= transaction.amount;
+    }
+
+    user.transactions += 1;
+
+    await this.userRepository.save(user);
+  }
 }
