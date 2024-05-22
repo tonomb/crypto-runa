@@ -162,7 +162,7 @@ export class TransactionsService {
       const balanceFormatted = user.balance.toFixed(8); // Format the balance with 8 decimal points
 
       switch (user.name) {
-        case 'No Refferance':
+        case 'No Refference':
           console.log(
             `Deposited without reference: count=${user.transactions} sum=${balanceFormatted}`,
           );

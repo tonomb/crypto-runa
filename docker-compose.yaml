@@ -6,7 +6,4 @@ services:
       - '3000:3000'
     volumes:
       - .:/usr/src/app
-      - sqlite-data:/usr/src/app # Ensure database is in the correct directory
-
-volumes:
-  sqlite-data:
+    command: yarn run start:transactions

@@ -1,11 +1,11 @@
 # Use the official Node.js image
-FROM node:18
+FROM node:21.6.2
 
 # Create and change to the app directory
 WORKDIR /usr/src/app
 
 # Copy application dependency manifests to the container image
-COPY package*.json yarn.lock ./
+COPY package.json yarn.lock ./
 
 # Install production dependencies
 RUN yarn install
@@ -13,10 +13,11 @@ RUN yarn install
 # Copy local code to the container image
 COPY . .
 
-# Set permissions for the database file
-RUN mkdir -p database && touch database/database.sqlite && chmod 777 database/database.sqlite
+# Add SQLite3 to container
+RUN yarn add sqlite3
 
-# Expose the port and start the app
+# Expose the port
 EXPOSE 3000
 
-CMD ["yarn", "process"]
+# Command to run your script
+CMD ["yarn", "run", "start:transactions"]
