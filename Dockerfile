@@ -15,7 +15,6 @@ COPY . .
 
 # Add SQLite3 to container
 RUN yarn add sqlite3
-RUN yarn add ts-node
 
 # Expose the port
 EXPOSE 3000

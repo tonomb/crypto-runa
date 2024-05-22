@@ -2,7 +2,9 @@
 
 The exercise requires docker to be installed.
 
-In the repo root directory, run `docker-compose up --build` to process all transactions
+1. In the repo root directory, run `yarn install` to gather all dependencies.
+
+2. Then run `docker-compose up --build` to process all transactions
 
 ## Notes
 
