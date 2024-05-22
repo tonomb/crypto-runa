@@ -1,3 +1,13 @@
+## Running App
+
+The exercise requires docker to be installed.
+
+In the repo root directory, run `docker-compose up --build` to process all transactions
+
+## Notes
+
+The goal was to process all transactions and filter them for valid deposits. I decided to take into account both the sent and received transactions in order to get an acurate output of a users balance, not only the deposits.
+
 # Node.js and Docker Crypto/Payments Test
 
 A crypto payments company receives thousands of deposits from customers per day. This test is designed to test your ability to work with a transaction set that could get returned by a blockchain daemon like bitcoind.
