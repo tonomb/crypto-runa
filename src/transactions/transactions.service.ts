@@ -154,4 +154,50 @@ export class TransactionsService {
       throw error;
     }
   }
+
+  async generateReport() {
+    const users = await this.userRepository.find();
+
+    users.forEach((user) => {
+      const balanceFormatted = user.balance.toFixed(8); // Format the balance with 8 decimal points
+
+      switch (user.name) {
+        case 'No Refferance':
+          console.log(
+            `Deposited without reference: count=${user.transactions} sum=${balanceFormatted}`,
+          );
+          break;
+        case 'James T. Kirk':
+          console.log(
+            `Deposited for ${user.name}: count=${user.transactions} sum=${balanceFormatted}`,
+          );
+          break;
+        default:
+          console.log(
+            `Deposited for ${user.name}: count=${user.transactions} sum=${balanceFormatted}`,
+          );
+          break;
+      }
+    });
+
+    const smallestDeposit = await this.getSmallestValidDeposit();
+    const largestDeposit = await this.getLargestValidDeposit();
+
+    console.log(`Smallest valid deposit: ${smallestDeposit}`);
+    console.log(`Largest valid deposit: ${largestDeposit}`);
+  }
+
+  private async getSmallestValidDeposit(): Promise<string> {
+    const result = await this.transactionRepository.query(
+      `SELECT MIN(amount) as smallest FROM 'transaction' WHERE confirmations > 5 AND category = 'receive'`,
+    );
+    return parseFloat(result[0].smallest).toFixed(8);
+  }
+
+  private async getLargestValidDeposit(): Promise<string> {
+    const result = await this.transactionRepository.query(
+      `SELECT MAX(amount) as largest FROM 'transaction' WHERE confirmations > 5 AND category = 'receive'`,
+    );
+    return parseFloat(result[0].largest).toFixed(8);
+  }
 }
