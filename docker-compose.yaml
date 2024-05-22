@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  app:
+    container_name: antomb_runa_crypto
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+      - sqlite-data:/usr/src/app # Ensure database is in the correct directory
+    command: yarn start:dev
+
+volumes:
+  sqlite-data:
