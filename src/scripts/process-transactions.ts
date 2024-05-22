@@ -12,6 +12,8 @@ async function bootstrap() {
 
   await transactionsService.seedTransactions('transactions-2');
 
+  await transactionsService.clearProcessedTransactions();
+
   console.log('Seeded database');
   console.log('----------');
 

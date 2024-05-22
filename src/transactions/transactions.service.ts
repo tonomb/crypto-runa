@@ -48,6 +48,10 @@ export class TransactionsService {
     await this.transactionRepository.save(uniqueTransactions);
   }
 
+  async clearProcessedTransactions() {
+    await this.processedTransactionsRepository.clear();
+  }
+
   async processTransactions(): Promise<void> {
     try {
       const transactions = await this.transactionRepository.find();
@@ -129,10 +133,10 @@ export class TransactionsService {
     try {
       if (transaction.category === 'receive') {
         user.balance += transaction.amount;
+        // comment in case you only want deposits
       } else if (transaction.category === 'send') {
         user.balance -= transaction.amount;
       }
-
       user.transactions += 1;
 
       await this.userRepository.save(user);
