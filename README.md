@@ -10,6 +10,18 @@ The exercise requires docker to be installed.
 
 The goal was to process all transactions and filter them for valid deposits. I decided to take into account both the sent and received transactions in order to get an acurate output of a users balance, not only the deposits.
 
+## Troubleshooting
+
+If for some reaason you see the `ERROR [TypeOrmModule] Unable to connect to the database` error message when running `docker-compose up` follow these steps.
+
+1. In the root directory run `docker-compose run app sh` to open up a shell
+
+1. Then run the command `yarn add sqlite3` to add sqlite to the container
+
+1. Run `yarn start:transactions` to process all transactions
+
+1. `docker-compose up` should now be working
+
 # Node.js and Docker Crypto/Payments Test
 
 A crypto payments company receives thousands of deposits from customers per day. This test is designed to test your ability to work with a transaction set that could get returned by a blockchain daemon like bitcoind.
