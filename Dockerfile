@@ -5,7 +5,7 @@ FROM node:18
 WORKDIR /usr/src/app
 
 # Copy application dependency manifests to the container image
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
 # Install production dependencies
 RUN yarn install
@@ -19,4 +19,4 @@ RUN mkdir -p database && touch database/database.sqlite && chmod 777 database/da
 # Expose the port and start the app
 EXPOSE 3000
 
-CMD ["yarn", "start:dev"]
+CMD ["yarn", "process"]

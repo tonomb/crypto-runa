@@ -4,11 +4,20 @@ import { TransactionsService } from '../transactions/transactions.service';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  const transactionService = app.get(TransactionsService);
+  const transactionsService = app.get(TransactionsService);
 
-  await transactionService.processTransactions();
+  await transactionsService.seedUsers();
 
-  await transactionService.generateReport();
+  await transactionsService.seedTransactions('transactions-1');
+
+  await transactionsService.seedTransactions('transactions-2');
+
+  console.log('Seeded database');
+  console.log('----------');
+
+  await transactionsService.processTransactions();
+
+  await transactionsService.generateReport();
 
   await app.close();
 }

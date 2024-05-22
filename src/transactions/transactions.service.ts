@@ -169,7 +169,7 @@ export class TransactionsService {
           break;
         case 'James T. Kirk':
           console.log(
-            `Deposited for ${user.name}: count=${user.transactions} sum=${balanceFormatted}`,
+            ` Deposited for ${user.name}: count=${user.transactions} sum=${balanceFormatted}`,
           );
           break;
         default:
